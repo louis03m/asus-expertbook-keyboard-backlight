@@ -1,0 +1,42 @@
+ITALIANO - Usare l'AI per studiare un altro modello ASUS
+
+Puoi fornire questi SORGENTI a un assistente AI per farti aiutare nell'analisi
+del tuo modello. Non basta cambiare B1502CBA con il nome del tuo PC.
+
+Prompt suggerito:
+"Analizza questo progetto ASUS in sola lettura per il mio modello [modello],
+BIOS [versione], EC [versione se disponibile], driver ASUS [versione].
+Non eseguire scritture EC, chiamate WMI di modifica, accessi a porte hardware,
+flash firmware o modifiche a servizi/driver. Non rimuovere i controlli del progetto.
+Prima identifica nel firmware corrispondente il parametro della tastiera e
+l'esatta semantica di valori/comandi, autorizzazioni e sincronizzazione.
+Verifica agenti ASUS, messaggi/eventi e coerenza tra stato fisico e stato ASUS,
+collisioni, timeout, transazioni interrotte e ripristino. Distingui fatti provati
+da ipotesi. Prepara un piano verificabile prima di qualsiasi prova attiva."
+
+Un'AI puo' sbagliare o inventare indirizzi/valori. Servono prove sul firmware
+esatto e poi una validazione specifica sul dispositivo: un controllo statico,
+un hash uguale o una risposta plausibile dell'AI non provano la sicurezza EC.
+Non distribuire un adattamento come compatibile finche' non e' stato verificato.
+Rimuovi seriali, credenziali e altri dati personali da log/dump prima di condividerli.
+
+ENGLISH - Use AI to investigate another ASUS model
+
+You may give these SOURCE files to an AI assistant for help analyzing your own
+model. Merely replacing B1502CBA with your model name is not a valid adaptation.
+
+Suggested prompt:
+"Review this ASUS project in read-only mode for my model [model], BIOS [version],
+EC [version if known], ASUS driver [version]. Do not perform EC writes, mutating
+WMI calls, raw hardware-port access, firmware flashing or driver/service changes.
+Do not bypass the project's checks. First establish the keyboard parameter and
+the exact command/value semantics from the matching firmware, including access
+permissions and synchronization. Verify ASUS agents, events/messages, physical
+versus ASUS logical state, collisions, timeouts, interrupted transactions and
+recovery. Separate verified evidence from assumptions. Prepare a reviewable
+validation plan before proposing any active hardware test."
+
+AI can invent addresses or values. Evidence from the exact firmware and specific
+device validation are required; static checks, matching hashes or a plausible
+AI answer do not establish EC safety. Do not claim an adaptation is compatible
+until verified. Remove serials, credentials and personal data from shared logs/dumps.

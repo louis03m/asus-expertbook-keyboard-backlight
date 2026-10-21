@@ -1,0 +1,4 @@
+.analysis/
+keyboard-state.json
+keyboard-state.json.previous
+*.tmp
