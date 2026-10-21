@@ -45,6 +45,13 @@ $mutex=Get-ComponentMutex;$held=$false
 try{
     try{$held=$mutex.WaitOne(15000)}catch [Threading.AbandonedMutexException]{$held=$true}
     if(-not $held){throw 'Worker still owns a transaction; rollback stopped without forcing termination.'}
+    if($config.InstallKind -eq 'Fresh'){
+        Unregister-ScheduledTask -TaskName 'Codex-ASUS-KeyboardCycle' -Confirm:$false
+        if($boot){Unregister-ScheduledTask -TaskName 'Codex-ASUS-KeyboardPrelogin' -Confirm:$false}
+        Write-ComponentJson (Join-Path $data 'rollback-complete.json') @{Utc=[DateTime]::UtcNow.ToString('o');State='Native ASUS handling restored';FilesRetained=$true}
+        Write-Output 'Standalone tasks removed. Native ASUS handling retained; files/logs and current brightness preserved.'
+        return
+    }
     $preference=Read-AsusKeyboardPreference (Join-Path $data 'keyboard-state.json')
     if($preference){
         Copy-Item -LiteralPath (Join-Path $config.LegacyRoot 'keyboard-state.json') -Destination (Join-Path $data ('legacy-preference-before-rollback-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'.json'))

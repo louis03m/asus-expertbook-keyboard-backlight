@@ -1,199 +1,215 @@
-# ASUS B1502CBA — unified startup preview v0.3
+# ASUS ExpertBook B1502CBA — v0.3.1-preview
+
+**Pacchetto unico / Standalone package · BIOS 316 / 317 · Italiano / English**
 
 ## Italiano
 
-**Preview sperimentale, BIOS 316 e 317 soltanto. Sul PC B1502CBA con BIOS 317 sono
-stati verificati il ripristino automatico High prima della sessione, il ciclo
-spento/medio/alto alla schermata di accesso e il passaggio al desktop. Non è una
-validazione su altri PC; gli avvii da preferenza Off e Medium non sono stati
-provati separatamente al boot, ma i relativi stati e la selezione sono coperti
-dai test offline e dal ciclo fisico.**
+Una sola installazione per **spento → medio → alto → spento** con la hotkey ASUS,
+memoria dell'ultima scelta, ripristino prima della sessione Windows e gestione dopo
+il login. **Non serve installare prima la 0.2 o la 0.3.**
 
-Questa estensione richiede il ciclo a tre stati v0.2 già funzionante. Non modifica
-servizi, driver o programmi ASUS. Usa un'attività SYSTEM all'avvio e la normale
-attività elevata dell'utente dopo il login; non installa un servizio Windows.
+Sul PC B1502CBA con BIOS 317 sono stati verificati il ripristino automatico High prima
+della sessione, il ciclo completo prima del login e il passaggio al desktop con High
+conservato. Non è una validazione su altri PC. Gli avvii separati da preferenza Off e
+Medium e sospensione/ripresa non sono completamente verificati. È un workaround
+sperimentale indipendente da ASUS, non una correzione ufficiale o universale.
 
-- Ripristina **spento, medio oppure alto salvati**, senza scegliere alto per default.
-- Prima della sessione, il tasto C7 seleziona fisicamente spento → medio → alto.
-  ASUS elabora comunque il tasto: può esserci un breve passaggio intermedio.
-- In questa fase la conferma è **solo fisica via WMI**: lo stato interno del servizio
-  ASUS può differire. La scelta viene registrata separatamente e viene confermata
-  nello stato ordinario solo dopo l'allineamento con l'agente ASUS al login.
-- Dopo l'avvio della sessione, il worker rilascia il controllo e il ciclo desktop
-  riallinea ASUS tramite i messaggi originali già studiati. Un solo listener attivo.
-- Gli spegnimenti ASUS per inattività non sovrascrivono la preferenza. Non c'è un
-  ciclo continuo di scritture per tenere accesa la luce contro un timeout ASUS.
-- Se Windows prepara la sessione dietro la schermata bloccata, il ciclo desktop
-  può funzionare già lì; questo non prova il percorso prima della sessione.
+### 1. Scaricare ed estrarre
 
-### Installazione su una v0.2 già funzionante
+Scaricare lo ZIP **v0.3.1 standalone** dagli asset della
+[release](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases/tag/v0.3.1-preview)
+ed estrarlo interamente. Usare lo ZIP allegato, non l'archivio automatico Source code.
 
-Estrarre tutto lo ZIP. Windows PowerShell 5.1 a 64 bit, come amministratore con
-lo stesso account che possiede il ciclo attuale:
+Requisiti: B1502CBA, BIOS B1502CBA.316 o B1502CBA.317, esatti binari ASUS verificati
+da Assert-Compatibility.ps1, software ASUS attivo, Windows PowerShell 5.1 a 64 bit
+e account amministratore. Se i controlli falliscono, fermarsi: non rimuoverli e non
+copiare indirizzi EC su altri modelli.
+
+### 2. Un solo comando per installare o aggiornare
+
+Aprire **Windows PowerShell a 64 bit come amministratore**, con il proprio account,
+nella cartella estratta:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1 -LegacyDirectory 'C:\Program Files\AsusKeyboardBacklight-Experimental'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1
 ```
 
-Per un'installazione in un'altra cartella, indicare il percorso reale del ciclo
-esistente. L'installatore rifiuta modelli, BIOS, binari ASUS o attività inattesi.
-Non sovrascrive una precedente installazione v0.3.
+- **Prima installazione:** crea le due attività necessarie e legge il livello attuale
+  come scelta iniziale. Non imposta High per default. Poi scegliere il livello con la hotkey.
+- **0.2 già presente:** rileva il percorso dall'attività, importa la scelta e conserva
+  file e definizioni originali per il rollback. Nessun download aggiuntivo.
+- **0.3/0.3.1 già presente:** aggiorna in posizione con backup del codice, arresto
+  cooperativo e conservazione di preferenza e modalità di avvio persistente.
+- Attività parziali, utenti/percorsi inattesi o cartelle non protette vengono rifiutati.
 
-Codice protetto in `C:\Program Files\AsusKeyboardUnified-v0.3`; configurazione,
-preferenza, log e backup XML in `C:\ProgramData\NeaLogic\AsusKeyboardUnified-v0.3`.
-Solo SYSTEM e amministratori possono modificarli. Non usare cartelle modificabili
-dagli utenti come sorgente di codice SYSTEM.
+Solo per scegliere esplicitamente il livello alla prima installazione:
 
-L'installazione verifica una lettura WMI come SYSTEM (nessuna scrittura luminosità),
-arresta cooperativamente il vecchio ciclo e avvia il nuovo desktop. Il ripristino
-desktop può cambiare la luminosità. **Arma una sola prova al prossimo avvio**;
-non riavvia il computer. I file originali rimangono nella cartella precedente.
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1 -InitialLevel High
+```
 
-### Stato e prova reale
+Valori ammessi: Off, Medium, High. Il parametro viene rifiutato negli aggiornamenti,
+che devono mantenere la scelta esistente. L'installazione verifica una lettura WMI
+come SYSTEM senza scrivere la luminosità; l'avvio del desktop può poi ripristinare il
+livello. Non esegue riavvii automatici.
+
+### 3. Verificare e attivare l'avvio
+
+Codice: `C:\Program Files\AsusKeyboardUnified-v0.3`. Stato, log e backup:
+`C:\ProgramData\NeaLogic\AsusKeyboardUnified-v0.3`. Il nome cartella indica la famiglia
+0.3, compresa la 0.3.1. Solo SYSTEM e amministratori possono modificare queste cartelle.
 
 ```powershell
 Set-Location 'C:\Program Files\AsusKeyboardUnified-v0.3'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action Status
 ```
 
-Controllare `desktop-runtime\status.json`: `Listening`. Verificare visivamente il
-ciclo dopo il login. Per il vero test prima della sessione, salvare il lavoro,
-disconnettere l'utente e riavviare dalla schermata di accesso: non cambiare impostazioni
-di sicurezza o accesso automatico. Non accedere subito: attendere 30 secondi SENZA
-premere il tasto e verificare il livello salvato. Solo dopo provare tre pressioni,
-distanziate di tre secondi, poi accedere e verificare conservazione della scelta.
+Verificare desktop `Listening` e provare visivamente il ciclo, circa tre secondi fra
+le pressioni. Scegliere il livello da ricordare. Una nuova installazione prepara
+**un solo avvio di prova**: salvare il lavoro, disconnettere l'utente e riavviare dalla
+schermata di accesso. Aspettare 30 secondi senza premere il tasto, controllare il
+livello salvato, provare il ciclo e accedere. I 30 secondi sono una finestra di
+osservazione, non un ritardo programmato. Non cambiare impostazioni di sicurezza/login.
 
-Boot-status.json e i log Boot-* documentano la fase all'avvio. Una prova finita
-con `UserSessionPresent` non prova la fase senza utente. Se arrivano errori, il
-worker interrompe le scritture; non riprovare manualmente comandi EC. Il worker
-prima della sessione termina dopo 30 minuti se nessuno accede; la prova non è una
-gestione indefinita. La prova singola viene consumata anche se Windows ha già
-preparato la sessione: per ripeterla usare `-Action ArmOnce`.
-
-Solo dopo prova reale riuscita e conferma visiva si può abilitare l'avvio persistente:
+Dopo una prova riuscita sul proprio PC, abilitare tutti gli avvii:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action EnablePersistentBoot -VisualBootConfirmed
 ```
+
+Richiede anche readback e passaggio al desktop nei log. Per ripetere la prova usare
+`-Action ArmOnce`. Un aggiornamento conserva la modalità di avvio già scelta.
 
 ### Tornare indietro
 
+Da PowerShell amministratore nella cartella installata:
+
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action Rollback
 ```
 
-Attende il rilascio dei mutex senza terminare transazioni, ripristina le definizioni
-originali delle attività e la preferenza confermata e riavvia il ciclo precedente.
-Conserva file e log per diagnosi. Non cancellare le cartelle mentre un worker gira.
-Il fallback spento/alto precedente rimane disponibile nella vecchia installazione.
-Un errore del nuovo desktop richiede il rollback automatico verso il ciclo precedente;
-un errore del solo boot lascia intatto il percorso desktop.
+Da un'installazione autonoma rimuove solo le nostre attività e restituisce i tasti ad
+ASUS. Da una migrazione della 0.2 ripristina le definizioni originali e la preferenza
+confermata del correttore precedente. Un aggiornamento fallito tenta di ripristinare
+il codice precedente. Attende il rilascio dei mutex, senza terminare transazioni a metà.
+File, stato e log rimangono disponibili. Per il vecchio fallback Maximum eseguire prima
+il rollback. Nessun driver o servizio ASUS viene modificato.
 
-### Limiti e distribuzione
+### Funzionamento e limiti
 
-WMI modifica un parametro volatile EC: non flasha firmware. Il mutex protegge solo
-i nostri programmi, non rende atomico l'accesso rispetto ad altri software OEM.
-Non è provata la sincronizzazione della cache ASUS prima del login; viene eseguita
-al login. Cambi rapidi utente, sessioni remote, sospensione/ripresa e pressioni rapide
-non sono coperti dalla validazione. Non abbassare controlli, ACL o guardie di compatibilità.
-Nessun binario ASUS, preferenza personale o log viene incluso nel pacchetto pubblico.
-Leggere AI-adaptation-IT-EN.txt per l'analisi in sola lettura di altri modelli.
+Prima del login il worker SYSTEM conferma il **livello fisico** via WMI; lo stato interno
+ASUS può differire. La scelta viene conservata separatamente e il desktop la riallinea
+tramite l'agente ASUS prima di confermarla nello stato ordinario. Non invia messaggi al
+desktop protetto. Può esserci un breve livello intermedio perché anche ASUS gestisce il tasto.
+
+Gli spegnimenti temporanei ASUS non cancellano la preferenza. Nessun polling EC continuo
+per contrastare l'inattività. Il worker prelogin termina dopo 30 minuti senza accesso.
+Il mutex serializza i nostri client, non altri software OEM. Errori o risultati incerti
+fermano ulteriori scritture. Cambi rapidi utente, sessioni remote, sospensione e pressioni
+molto rapide non sono completamente verificati.
+
+Modifica un parametro **volatile EC**, non flasha BIOS e non applica patch ASUS. Nessun
+binario ASUS, log personale o preferenza dell'autore è incluso. Per altri modelli leggere
+AI-adaptation-IT-EN.txt: l'AI può aiutare nell'analisi in sola lettura, non garantire compatibilità.
 
 ## English
 
-**Experimental preview, B1502CBA BIOS 316/317 only. Automatic saved-High restoration
-before the user session, the off/medium/high cycle at the sign-in screen and handoff
-to the desktop were verified on the BIOS 317 development PC. Not verified on other
-PCs. Separate cold boots starting from saved Off and Medium have not been visually
-tested; those levels and selection logic are covered by offline checks and the
-physical key cycle.**
+One standalone package provides the original-key **off → medium → high → off** cycle,
+saved choice, pre-session restoration and desktop handling. **No prior v0.2/v0.3 installation
+or download is required.**
 
-Requires the working v0.2 three-state setup. Uses a SYSTEM startup task and the
-owner's elevated logon task, retaining ASUS services/drivers and the previous
-off/high fallback. No new Windows service or firmware flashing.
+Automatic saved-High restoration before the user session, the full prelogin cycle and
+desktop handoff retaining High were verified on the BIOS 317 development B1502CBA.
+Other PCs, separate saved-Off/Medium boots and suspend/resume remain incompletely tested.
+Independent experimental workaround, not an official or universal ASUS fix.
 
-Restores the saved **Off, Medium or High** choice; missing or invalid preferences
-never default to High. Before a user session, C7 cycles the physical levels through
-WMI. Native ASUS handling may cause a brief intermediate level. **Pre-session
-confirmation covers physical readback only**: ASUS's internal logical state may
-differ. Pre-session choices are kept separately and synchronized through the ASUS
-desktop agent before becoming ordinary confirmed preferences. One listener owns
-control at a time. OEM idle-off does not overwrite the saved choice.
+### Download, install or update
 
-Extract the whole archive. From elevated 64-bit Windows PowerShell 5.1 under the
-existing task owner's account:
+Extract the attached **v0.3.1 standalone ZIP** from the
+[release](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases/tag/v0.3.1-preview).
+Use the attached package rather than the automatic Source code archive. Requires B1502CBA,
+BIOS B1502CBA.316/317, exact ASUS images checked by Assert-Compatibility.ps1, original ASUS
+software running, 64-bit Windows PowerShell 5.1 and an administrator account. Stop on guard
+failures; do not bypass them or copy EC addresses to other models.
+
+From elevated **64-bit Windows PowerShell under your own account**, in the extracted folder:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1 -LegacyDirectory 'C:\Program Files\AsusKeyboardBacklight-Experimental'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1
 ```
 
-Supply the actual legacy folder if different. Unexpected models, BIOS versions,
-ASUS binaries, task owners and task actions are refused. Existing v0.3 directories
-are not overwritten. Protected code: `C:\Program Files\AsusKeyboardUnified-v0.3`.
-Protected state/logs/task backups: `C:\ProgramData\NeaLogic\AsusKeyboardUnified-v0.3`.
-SYSTEM/admin write access only. Original scripts remain unchanged.
+- **Fresh install:** creates its own two tasks and captures current brightness; never
+  defaults to High. Choose the preferred level with the key afterward.
+- **Existing v0.2:** automatically detects its directory, imports its choice and retains
+  original scripts/task definitions for rollback. No extra download.
+- **Existing v0.3/0.3.1:** backs up code, stops cooperatively and updates in place,
+  preserving the preference and persistent-boot setting.
+- Partial, unrelated, foreign-owner or unprotected installations are refused.
 
-Setup first checks a bounded SYSTEM WMI read with no brightness writes, stops the
-old cycle cooperatively and starts the new desktop (which can restore brightness).
-It arms **one boot trial**, does not reboot and does not enable persistent boot.
+Optionally select an initial level on a fresh install only:
 
-From the installed v0.3 folder, `Manage-Component.ps1 -Action Status` displays
-state. Confirm `Listening` in `desktop-runtime\status.json` and visually test the
-desktop cycle. For actual pre-session testing, save work, sign out and restart
-from the sign-in screen. Do not alter sign-in/security settings. Wait 30 seconds
-without pressing the key and check the saved level; then test three keypresses
-three seconds apart, sign in and check the final level is retained.
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-Component.ps1 -InitialLevel High
+```
 
-Inspect Boot-status.json and Boot-* logs. `UserSessionPresent` is not proof of a
-pre-user-session test. One trial is consumed even if Windows prepares the session
-early; use `Manage-Component.ps1 -Action ArmOnce` for another trial. The boot worker
-stops after 30 minutes without login. On uncertainty it stops further writes.
-No EC polling loop or repeated force-on against ASUS idle behavior.
+Allowed: Off, Medium, High. Updates refuse this option to preserve existing choices.
+Setup first verifies a bounded SYSTEM WMI read without brightness writes; desktop startup
+can then restore brightness. No automatic reboot.
 
-Only after successful real boot and visual confirmation:
+### Check and enable startup
+
+Code: `C:\Program Files\AsusKeyboardUnified-v0.3`. State/logs/backups:
+`C:\ProgramData\NeaLogic\AsusKeyboardUnified-v0.3`. Directory name denotes the 0.3 family,
+including 0.3.1. Only SYSTEM/admins can modify these folders.
+
+```powershell
+Set-Location 'C:\Program Files\AsusKeyboardUnified-v0.3'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action Status
+```
+
+Confirm desktop `Listening`, test the key cycle three seconds apart and choose the saved
+level. New installs arm **one boot trial**. Save work, sign out and restart from the sign-in
+screen to avoid Windows preparing a user session early. Wait 30 seconds without pressing
+the key, check the saved level, test the cycle and sign in. This is an observation window,
+not a programmed delay. Do not alter sign-in/security settings.
+
+After successful visual validation on your PC:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action EnablePersistentBoot -VisualBootConfirmed
 ```
 
-Rollback, from elevated PowerShell in the installed v0.3 folder:
+Requires matching firmware readback and handoff logs. Use `-Action ArmOnce` for another
+trial. Updates preserve the existing boot mode.
+
+### Rollback / removal
+
+From elevated PowerShell in the installed folder:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Manage-Component.ps1 -Action Rollback
 ```
 
-Waits for cooperative release, restores original task definitions and the confirmed
-preference, and starts the legacy cycle. Retains files/logs. The old off/high fallback
-is retained in the old installation. Desktop failure requests automatic rollback;
-boot-only failure leaves desktop handling available.
+Fresh installs remove only our tasks and return the key to native ASUS handling. A migrated
+v0.2 install restores its original tasks and confirmed choice. Failed in-place updates
+attempt to restore previous code. Waits cooperatively; no forced transaction termination.
+Files/state/logs retained; no ASUS service/driver changes. Roll back before using a legacy
+Maximum fallback.
 
-The mutex serializes our clients only, not other OEM software. Pre-session ASUS cache
-synchronization is not established and is deferred to login. Fast user switching,
-remote sessions, suspend/resume and rapid presses are not validated. Keep all guards
-and ACLs. No ASUS binaries or personal data are shipped. For other models, consult
-AI-adaptation-IT-EN.txt for read-only investigation, never blind address/byte edits.
+### Limits
+
+Prelogin confirmation is **physical WMI readback**; ASUS internal state can differ. Desktop
+synchronizes ASUS before confirming the ordinary preference. No protected-desktop messaging.
+A brief intermediate level can remain because ASUS also handles the key. Temporary idle-off
+does not erase the choice; no continuous EC polling. The prelogin worker stops after 30
+minutes without login. The mutex serializes only our clients, not other OEM software.
+Errors/uncertain results stop further writes. Fast user switching, remote sessions,
+suspend/resume and rapid keys are not fully validated.
+
+Volatile EC parameter only; no BIOS flash or ASUS binary patch. No ASUS binaries, personal
+logs or author preferences shipped. For another model, use AI-adaptation-IT-EN.txt for
+read-only investigation; AI does not establish EC safety.
 
 Repository: https://github.com/louis03m/asus-expertbook-keyboard-backlight
-Pull requests remain disabled. Do not publish this preview as boot-validated until
-the real pre-session device test is completed.
 
-## Verifiche / Verification — 22 October 2026
-
-9 script con sintassi verificata; 41 controlli offline di selezione/stato/rollback,
-6 verifiche del passaggio delle scelte prelogin al desktop e 14 casi mock del helper
-WMI. Lettura SYSTEM senza scrittura luminosità verificata. L'utente ha confermato
-il ripristino High senza premere il tasto, il ciclo prima del login e la conservazione
-di High dopo il login. La prima prova ha confermato il controllo fisico prima della
-sessione; l'allineamento con la cache ASUS è avvenuto al login.
-
-9 script syntax checks; 41 offline policy/state/rollback checks, 6 desktop pending-choice
-checks and 14 mocked mailbox cases. Bounded SYSTEM read verified without brightness
-writes. User confirmed automatic High restoration without a keypress, prelogin key
-cycle and High remaining after login. Pre-session proof is physical readback;
-ASUS logical synchronization occurred at login.
-
-I 30 secondi indicati nella prova sono un tempo di osservazione, non un ritardo
-programmato. The 30-second test wait is an observation window, not a programmed delay.
-
-Per usare il precedente fallback Maximum, eseguire prima il rollback v0.3.
-Run v0.3 rollback before using the legacy Maximum fallback.
+Pull requests disabled; no collaborator access granted. Public forks remain possible.

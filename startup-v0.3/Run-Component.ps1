@@ -82,8 +82,6 @@ try{
     }
     if([Security.Principal.WindowsIdentity]::GetCurrent().User.Value -cne 'S-1-5-18'){throw 'Boot/preflight worker must run as SYSTEM.'}
     $preference=Read-AsusKeyboardPreference $preferencePath
-    if(-not $preference){throw 'No valid saved preference; no default High and no controller commands.'}
-    $choice=Read-LatestComponentChoice $preferencePath $pendingPath $bios
     if($Mode -eq 'Preflight'){
         Register-WmiEvent -Namespace root/wmi -Query 'SELECT * FROM AsusAtkWmiEvent' -SourceIdentifier $source | Out-Null
         $subscribed=$true
@@ -96,6 +94,8 @@ try{
         Set-ComponentStatus 'Complete' 'SYSTEM WMI subscription and bounded read verified; zero brightness writes.'
         return
     }
+    if(-not $preference){throw 'No valid saved preference; no default High and no controller commands.'}
+    $choice=Read-LatestComponentChoice $preferencePath $pendingPath $bios
     $armedPath=Join-Path $data 'boot-armed.json'
     $armed=Read-ComponentJson $armedPath
     if(-not $armed -or $armed.Version -ne 1 -or $armed.NotBeforeBootId -ceq $bootId){Set-ComponentStatus 'NotArmed';return}
@@ -138,7 +138,13 @@ try{
 }catch{
     Log-Component 'Error' $_.Exception.ToString()
     Set-ComponentStatus 'Error' $_.Exception.Message
-    if($Mode -eq 'Desktop'){
+    $setupActive=$false
+    $setup=Read-ComponentJson (Join-Path $data 'setup-in-progress.json')
+    if($setup){
+        $installer=Get-Process -Id $setup.ProcessId -ErrorAction SilentlyContinue
+        $setupActive=$installer -and $installer.StartTime.ToUniversalTime().ToString('o') -ceq $setup.StartUtc
+    }
+    if($Mode -eq 'Desktop' -and -not $setupActive){
         # Child watcher has released the listener mutex before returning an error.
         $shell=Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Start-Process -FilePath $shell -ArgumentList ('-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "'+(Join-Path $PSScriptRoot 'Manage-Component.ps1')+'" -Action Rollback') -WindowStyle Hidden | Out-Null
