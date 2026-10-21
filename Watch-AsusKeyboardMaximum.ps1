@@ -21,7 +21,7 @@ try {
     # The EC address and command were verified on this exact model/BIOS only.
     $model = (Get-CimInstance -Namespace root/cimv2 -ClassName Win32_ComputerSystem).Model
     $bios = (Get-CimInstance -Namespace root/cimv2 -ClassName Win32_BIOS).SMBIOSBIOSVersion
-    if ($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -ne 'B1502CBA.316') {
+    if ($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -cnotin @('B1502CBA.316','B1502CBA.317')) {
         throw ('Unverified model/BIOS; no EC commands: ' + $model + ' / ' + $bios)
     }
     $listenerMutex = New-Object Threading.Mutex($false, 'Global\Codex.Asus.KeyboardMaximum.Listener')
@@ -49,7 +49,7 @@ public static class AsusRegistryNotification {
     if ($null -eq $registryKey) { throw 'ASUS keyboard settings key not found.' }
     $registrySignal = New-Object Threading.AutoResetEvent($false)
     [AsusRegistryNotification]::Arm($registryKey.Handle,$registrySignal.SafeWaitHandle)
-    Set-State 'Listening' 'B1502CBA.316 checked; read-only registry notifications; WMI correction only when ASUS says on.'
+    Set-State 'Listening' ($bios + ' checked; read-only registry notifications; WMI correction only when ASUS says on.')
     $clock = [Diagnostics.Stopwatch]::StartNew()
     $count = 0; $startup = $true
     while (($Seconds -eq 0 -or $clock.Elapsed.TotalSeconds -lt $Seconds) -and -not (Test-Path $stopPath)) {

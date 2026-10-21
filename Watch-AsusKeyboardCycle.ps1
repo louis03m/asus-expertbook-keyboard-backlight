@@ -56,7 +56,7 @@ try {
     . (Join-Path $PSScriptRoot 'KeyboardStateStore.ps1')
     $model=(Get-CimInstance -Namespace root/cimv2 -ClassName Win32_ComputerSystem).Model
     $bios=(Get-CimInstance -Namespace root/cimv2 -ClassName Win32_BIOS).SMBIOSBIOSVersion
-    if($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -ne 'B1502CBA.316'){throw 'Unverified model/BIOS; no keyboard commands.'}
+    if($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -cnotin @('B1502CBA.316','B1502CBA.317')){throw 'Unverified model/BIOS; no keyboard commands.'}
     $optimization='C:\Windows\System32\DriverStore\FileRepository\asussci2.inf_amd64_197d319fab43e0fe\ASUSOptimization\AsusOptimization.exe'
     if((Get-FileHash $optimization).Hash -ine 'E160B6DE0ADAB88D834AABA6D3086495115B6CC23E8734273C5AD7DCCDA4340B'){throw 'ASUS service changed; keyboard dispatch needs rechecking.'}
     $cycleMutex=New-Object Threading.Mutex($false,'Global\Codex.Asus.KeyboardMaximum.Listener')
@@ -91,6 +91,10 @@ try {
         $script:cycleIndex=[Array]::IndexOf($cycleNames,[string]$preference.Level)
         $restored=Apply-CycleState $preference.Level
         Write-CycleLog @{Time=(Get-Date).ToString('o');State=$(if($restored){'SavedStateRestored'}else{'SavedStateRestoreSuperseded'});Level=$preference.Level;SavedUtc=$preference.SavedUtc}
+        if($restored -and $preference.Bios -cne $bios){
+            $migrated=Save-AsusKeyboardPreference -Path $preferencePath -Level $preference.Level -Source Migration -Bios $bios
+            Write-CycleLog @{Time=(Get-Date).ToString('o');State='SavedStateBiosMigrated';Level=$migrated.Level;PreviousBios=$preference.Bios;Bios=$migrated.Bios}
+        }
     }else{
         $initialPath=Join-Path $AuditDirectory ('transactions\'+$cycleRun+'-initial')
         & (Join-Path $PSScriptRoot 'Set-AsusKeyboardState.ps1') -State Read -AuditDirectory $initialPath
@@ -100,7 +104,7 @@ try {
         # First-run capture only; an invalid file is retained until a confirmed key.
         $initialExpected=if($script:cycleIndex -eq 0){128}else{131}
         if(-not $NoStateMemory -and -not $preferenceRejected -and $cycleRegistry.GetValue('KeybdLightLevel',-1) -eq $initialExpected){
-            $null=Save-AsusKeyboardPreference -Path $preferencePath -Level $cycleNames[$script:cycleIndex] -Source InitialCapture
+            $null=Save-AsusKeyboardPreference -Path $preferencePath -Level $cycleNames[$script:cycleIndex] -Source InitialCapture -Bios $bios
         }
     }
     Write-CycleStatus 'Listening' 'Hotkey C7: Off -> Medium -> High -> Off; ASUS on for Medium and High.'
@@ -122,7 +126,7 @@ try {
         $script:cycleIndex=($script:cycleIndex+$presses)%3
         $applied=Apply-CycleState $cycleNames[$script:cycleIndex]
         if($applied -and -not $NoStateMemory){
-            $saved=Save-AsusKeyboardPreference -Path $preferencePath -Level $cycleNames[$script:cycleIndex] -Source Hotkey
+            $saved=Save-AsusKeyboardPreference -Path $preferencePath -Level $cycleNames[$script:cycleIndex] -Source Hotkey -Bios $bios
             Write-CycleLog @{Time=(Get-Date).ToString('o');State='LastStateSaved';Level=$saved.Level;SavedUtc=$saved.SavedUtc}
         }
         Write-CycleStatus 'Listening' $(if($applied){'State confirmed with matching ASUS logical state.'}else{'Superseded by another hotkey; processing the pending event next.'})

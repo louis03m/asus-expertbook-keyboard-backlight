@@ -1,9 +1,9 @@
-# Read-only preflight. No mailbox, controller or keyboard commands.
+﻿# Read-only preflight. No mailbox, controller or keyboard commands.
 function Assert-AsusKeyboardCompatibility {
     $model = (Get-CimInstance -Namespace root/cimv2 -ClassName Win32_ComputerSystem).Model
     $bios = (Get-CimInstance -Namespace root/cimv2 -ClassName Win32_BIOS).SMBIOSBIOSVersion
-    if ($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -cne 'B1502CBA.316') {
-        throw 'Unsupported model/BIOS. This package only accepts B1502CBA / B1502CBA.316. Do not bypass this check.'
+    if ($model -notmatch '\bB1502CBA(?:_|\b)' -or $bios -cnotin @('B1502CBA.316','B1502CBA.317')) {
+        throw 'Unsupported model/BIOS. This package only accepts B1502CBA / B1502CBA.316 or B1502CBA.317. Do not bypass this check.'
     }
     $driverRoot = 'C:\Windows\System32\DriverStore\FileRepository\asussci2.inf_amd64_197d319fab43e0fe\ASUSOptimization'
     $images = @{

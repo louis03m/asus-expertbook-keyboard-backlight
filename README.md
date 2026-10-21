@@ -1,6 +1,6 @@
-# ASUS ExpertBook keyboard backlight — B1502CBA / BIOS 316
+# ASUS ExpertBook keyboard backlight — B1502CBA / BIOS 316 e 317
 
-**Experimental community workaround · v0.1-preview · Italiano / English**
+**Experimental community workaround · v0.2-preview · Italiano / English**
 
 ## Italiano
 
@@ -18,21 +18,21 @@ Non modifica o flasha il BIOS, non sostituisce driver e non applica patch ai pro
 
 ### Compatibilità: leggere prima di avviare
 
-- **ASUS ExpertBook B1502CBA**, BIOS **B1502CBA.316**.
+- **ASUS ExpertBook B1502CBA**, BIOS **B1502CBA.316 oppure B1502CBA.317**.
 - Percorso DriverStore e hash dei due binari ASUS devono corrispondere a quelli in `Assert-Compatibility.ps1`.
 - Windows PowerShell **5.1 a 64 bit**, account amministratore e software ASUS originale attivo.
-- **BIOS 317 e altri modelli/versioni sono rifiutati. Non rimuovere i controlli.**
+- **Altri modelli e versioni BIOS sono rifiutati. Non rimuovere i controlli.**
 
 Gli script non sono una correzione ufficiale ASUS o una soluzione universale. Il pacchetto non contiene binari ASUS, log, credenziali, indirizzi email o preferenze dell'autore.
 
 ### Download
 
-Aprire **[Releases](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases)** e scaricare l'asset `AsusKeyboardBacklight-B1502CBA-BIOS316-v0.1-preview.zip`. Il file di progetto automatico “Source code” è una copia dei sorgenti; per seguire queste istruzioni usare lo ZIP del pacchetto allegato alla release.
+Aprire **[Releases](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases)** e scaricare l'asset `AsusKeyboardBacklight-B1502CBA-BIOS316-317-v0.2-preview.zip`. Il file di progetto automatico “Source code” è una copia dei sorgenti; per seguire queste istruzioni usare lo ZIP del pacchetto allegato alla release.
 
 SHA-256 del pacchetto:
 
 ```text
-07ea2f2c21a446340dbd59206317886fb559f55471a6ca3d58aea1c07a7486e4
+045e688f5d8d7fb4109c6c6128665202b3d044367443f3feb5b9f5e104042198
 ```
 
 ### 1. Estrarre e controllare, senza cambiare la tastiera
@@ -93,9 +93,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Remove-Experimental.ps
 
 La rimozione non interrompe forzatamente transazioni, non cambia servizi/driver ASUS e conserva file, log e luminosità attuale. Le pressioni successive tornano alla gestione ASUS. In caso di installazione parziale, eseguire la rimozione dalla cartella sotto Program Files, non da una seconda copia estratta.
 
+### Da una versione precedente
+
+Il pacchetto accetta preferenze salvate con BIOS 316 o 317. Dopo un aggiornamento BIOS, conserva il livello e aggiorna il riferimento al BIOS solo dopo un ripristino riuscito; il file precedente rimane in `.previous`. Questo non sostituisce la verifica visiva sul proprio PC.
+
+L'installatore non aggiorna copie esistenti. Per sostituire v0.1, eseguire `Remove-Experimental.ps1` dalla vecchia cartella installata, conservare quella cartella come backup spostandola/rinominandola dopo l'arresto dei programmi, quindi installare dalla nuova cartella estratta. Non eseguire due copie insieme. Una nuova installazione non importa automaticamente la preferenza dalla vecchia cartella: selezionare nuovamente il livello con la hotkey. Per tornare indietro, rimuovere prima le attività della nuova copia e ripristinare la precedente; v0.1 accetta soltanto BIOS 316.
+
 ### Verifiche e limiti della preview
 
-Il ciclo e il salvataggio sono stati provati fisicamente sul PC di sviluppo; il rilancio del programma ha ripristinato tutti e tre gli stati salvati. **Il test completo riavvio/login di Windows resta da completare al momento di questa pubblicazione.** Il confezionamento pubblico, i controlli aggiuntivi e il nuovo installatore non sono stati installati su un secondo PC. Sono stati verificati la sintassi dei 13 script, otto controlli offline e il preflight in sola lettura sul PC di sviluppo.
+BIOS 316: ciclo, memoria e ripristino dopo riavvio/login verificati sul PC di sviluppo. BIOS 317: confronto del firmware EC e dei metodi ACPI/WMI pertinenti, ripristino in sessione e ciclo spento/medio/alto verificati sullo stesso PC. Un ulteriore riavvio/login con il programma aggiornato per 317 resta da verificare. Il pacchetto pubblico e il nuovo installatore non sono stati installati su un secondo PC. I controlli offline verificano compatibilità, rifiuto delle configurazioni sconosciute e migrazione delle preferenze; non inviano comandi al controller.
 
 Sospensione/ripresa, pressioni molto rapide e tutte le varianti hardware non sono completamente verificate. In caso di errore leggere i log; non ripetere scritture EC manualmente. Gli script di basso livello sono helper interni, non comandi generici per il controller.
 
@@ -119,16 +125,16 @@ No BIOS flashing, replacement drivers or ASUS binary patches are involved. The p
 
 ### Requirements and scope
 
-- **ASUS ExpertBook B1502CBA / BIOS B1502CBA.316** only.
+- **ASUS ExpertBook B1502CBA / BIOS B1502CBA.316 or B1502CBA.317** only.
 - Exact ASUS DriverStore paths and image hashes checked by `Assert-Compatibility.ps1`.
 - **64-bit Windows PowerShell 5.1**, administrator account, original ASUS software running.
-- **BIOS 317 and other configurations are rejected. Do not bypass the guards.**
+- **Other models and BIOS versions are rejected. Do not bypass the guards.**
 
 This is an independent experimental workaround, not an official or universal ASUS fix. No ASUS binaries, personal logs, credentials, email addresses or saved preferences are distributed.
 
 ### Download and read-only check
 
-Open **[Releases](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases)** and download the attached `AsusKeyboardBacklight-B1502CBA-BIOS316-v0.1-preview.zip` asset. Use this package, rather than the automatically generated source archive, for the instructions below. Its SHA-256 is listed above.
+Open **[Releases](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases)** and download the attached `AsusKeyboardBacklight-B1502CBA-BIOS316-317-v0.2-preview.zip` asset. Use this package, rather than the automatically generated source archive, for the instructions below. Its SHA-256 is listed above.
 
 Extract the **whole ZIP**, open Windows PowerShell in the folder containing the scripts and run:
 
@@ -183,9 +189,15 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Remove-Experimental.ps
 
 Removal does not force-terminate transactions or change ASUS drivers/services. Files, logs and current brightness are retained. For a partial installation, run removal from Program Files, not from another extracted copy.
 
+### Updating an earlier installation
+
+Saved preferences from BIOS 316 and 317 are accepted. After a BIOS update, the watcher preserves the level and updates the recorded BIOS only after successful restoration; `.previous` retains the preceding file. Visually verify operation on your PC.
+
+The installer does not update existing copies. To replace v0.1, run `Remove-Experimental.ps1` from the old installed folder, keep that folder as a backup by moving/renaming it after the watchers stop, then install from the new extracted folder. Never run both copies together. A fresh installation does not automatically import the preference from the old folder: choose the desired level again with the hotkey. To roll back, remove the new copy's tasks first and restore the earlier copy; v0.1 only accepts BIOS 316.
+
 ### Validation and limitations
 
-The cycle and preference saves were physically tested on the development computer; restarting the watcher restored each saved state. **A full Windows reboot/login test remains pending at publication.** The public packaging, extra guards and new installer have not been installed on a second computer. All 13 scripts passed syntax checks, eight offline guard checks passed, and the read-only compatibility check passed on the development computer.
+BIOS 316: cycle, saved preferences and restoration after Windows reboot/login verified on the development PC. BIOS 317: relevant EC firmware and ACPI/WMI methods compared, in-session restoration and off/medium/high cycle verified on the same PC. Another full reboot/login with the updated 317 watcher remains to be verified. The public package and installer have not been installed on a second PC. Offline checks cover compatibility, refusal of unknown configurations and preference migration; they send no controller commands.
 
 Suspend/resume, rapid presses and all hardware variants are not fully tested. Read logs on failure; do not retry low-level EC writes manually. The mailbox/state helpers are internal implementation details, not generic controller commands.
 
@@ -193,8 +205,8 @@ For another ASUS, read **[AI-adaptation-IT-EN.txt](AI-adaptation-IT-EN.txt)**. A
 
 ## References / Riferimenti
 
-- [Official B1502CBA BIOS downloads](https://www.asus.com/ca-en/supportonly/b1502cba/helpdesk_bios/): ASUS lists 317, but we have not tested it; the retrieved public notes do not explicitly mention this brightness issue.
+- [Official B1502CBA BIOS downloads](https://www.asus.com/ca-en/supportonly/b1502cba/helpdesk_bios/): official BIOS source. This workaround has been checked on BIOS 316 and 317; it is independent of ASUS.
 - [B1502 user report on LaptopMedia](https://laptopmedia.com/es/review/asus-expertbook-b1-b1502-review-business-features-on-the-budget/p2/).
 - [ExpertBook dim-backlight discussion on Reddit](https://www.reddit.com/r/ASUS/comments/1s0sdul/expert_book_keyboard_light_too_dim_please_help/).
 
-This repository is for distribution and documentation. Contributions and pull requests are not requested; no third-party collaborator access is granted.
+This repository is for distribution and documentation. Pull requests are disabled in repository settings; no third-party collaborator access is granted. Public copies and forks remain possible.
