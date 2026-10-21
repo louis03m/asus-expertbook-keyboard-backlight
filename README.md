@@ -1,8 +1,26 @@
 # ASUS ExpertBook keyboard backlight — B1502CBA / BIOS 316 e 317
 
-**Experimental community workaround · v0.2-preview · Italiano / English**
+**Experimental community workaround · v0.2 base + optional v0.3 startup preview · Italiano / English**
 
 ## Italiano
+
+### Novità opzionale: avvio prima della sessione — v0.3-preview
+
+La [preview v0.3](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases/tag/v0.3-preview) aggiunge il ripristino della scelta salvata già prima
+della sessione Windows, il ciclo con la stessa hotkey e il passaggio al desktop.
+Sul nostro B1502CBA con BIOS 317 sono stati verificati ripristino automatico High,
+spento → medio → alto prima del login e conservazione di High dopo l'accesso.
+Gli avvii separati da preferenza Off/Medium restano da verificare visivamente.
+
+È un'estensione della v0.2: **prima installare e verificare la v0.2 con la guida
+qui sotto**, poi seguire la [guida v0.3 italiano/inglese](startup-v0.3/README-IT-EN.md).
+Il nuovo installatore prepara una prova singola; la guida spiega come abilitarla
+per tutti gli avvii dopo la verifica sul proprio PC e come tornare indietro.
+Le conferme prima del login riguardano il livello fisico; ASUS viene riallineato
+al login. Rimangono i vincoli sul modello, BIOS e binari ASUS. Nessun driver o
+servizio ASUS modificato. Pull request disabilitate.
+
+ZIP v0.3: `AsusKeyboardBacklight-B1502CBA-BIOS316-317-v0.3-startup-preview.zip` · SHA-256: `a91774b7600578a3dadcc804a6acdc02ddaa488d7d9cd8ff95035c47868d26a2`
 
 ### Cosa fa
 
@@ -101,7 +119,7 @@ L'installatore non aggiorna copie esistenti. Per sostituire v0.1, eseguire `Remo
 
 ### Verifiche e limiti della preview
 
-BIOS 316: ciclo, memoria e ripristino dopo riavvio/login verificati sul PC di sviluppo. BIOS 317: confronto del firmware EC e dei metodi ACPI/WMI pertinenti, ripristino in sessione e ciclo spento/medio/alto verificati sullo stesso PC. Un ulteriore riavvio/login con il programma aggiornato per 317 resta da verificare. Il pacchetto pubblico e il nuovo installatore non sono stati installati su un secondo PC. I controlli offline verificano compatibilità, rifiuto delle configurazioni sconosciute e migrazione delle preferenze; non inviano comandi al controller.
+BIOS 316: ciclo, memoria e ripristino dopo riavvio/login verificati sul PC di sviluppo. BIOS 317: confronto del firmware EC e dei metodi ACPI/WMI pertinenti, ripristino in sessione e ciclo spento/medio/alto verificati sullo stesso PC. La verifica aggiuntiva dell'avvio e del passaggio al desktop e stata eseguita con l'estensione v0.3 descritta sopra. Il pacchetto pubblico e il nuovo installatore non sono stati installati su un secondo PC. I controlli offline verificano compatibilità, rifiuto delle configurazioni sconosciute e migrazione delle preferenze; non inviano comandi al controller.
 
 Sospensione/ripresa, pressioni molto rapide e tutte le varianti hardware non sono completamente verificate. In caso di errore leggere i log; non ripetere scritture EC manualmente. Gli script di basso livello sono helper interni, non comandi generici per il controller.
 
@@ -110,6 +128,23 @@ Sospensione/ripresa, pressioni molto rapide e tutte le varianti hardware non son
 Leggere **[AI-adaptation-IT-EN.txt](AI-adaptation-IT-EN.txt)**. È possibile fornire i sorgenti a un assistente AI per studiare il proprio firmware **in sola lettura** e ricostruire parametri, sincronizzazione e hotkey. Non basta cambiare il nome del modello o fidarsi di indirizzi suggeriti dall'AI: servono evidenze sul firmware esatto e verifiche specifiche prima di qualsiasi prova attiva.
 
 ## English
+
+### Optional startup extension — v0.3-preview
+
+[v0.3 preview](https://github.com/louis03m/asus-expertbook-keyboard-backlight/releases/tag/v0.3-preview) restores the saved level before the Windows user session,
+adds the same-key cycle there and hands off to the desktop. Automatic saved-High
+restoration, off → medium → high before login and High retention after login were
+verified on our BIOS 317 B1502CBA. Separate boots from saved Off/Medium remain
+visually unverified.
+
+Requires the working v0.2 base: **install and verify v0.2 using the guide below**,
+then follow the [Italian/English v0.3 guide](startup-v0.3/README-IT-EN.md). Setup arms
+one boot trial; the guide covers persistent activation after device validation and
+rollback. Prelogin confirmation is physical readback; ASUS logical synchronization
+follows at login. Exact model/BIOS/ASUS binary guards remain. No ASUS driver/service
+changes. Pull requests disabled.
+
+v0.3 ZIP: `AsusKeyboardBacklight-B1502CBA-BIOS316-317-v0.3-startup-preview.zip` · SHA-256: `a91774b7600578a3dadcc804a6acdc02ddaa488d7d9cd8ff95035c47868d26a2`
 
 ### What it does
 
@@ -197,7 +232,7 @@ The installer does not update existing copies. To replace v0.1, run `Remove-Expe
 
 ### Validation and limitations
 
-BIOS 316: cycle, saved preferences and restoration after Windows reboot/login verified on the development PC. BIOS 317: relevant EC firmware and ACPI/WMI methods compared, in-session restoration and off/medium/high cycle verified on the same PC. Another full reboot/login with the updated 317 watcher remains to be verified. The public package and installer have not been installed on a second PC. Offline checks cover compatibility, refusal of unknown configurations and preference migration; they send no controller commands.
+BIOS 316: cycle, saved preferences and restoration after Windows reboot/login verified on the development PC. BIOS 317: relevant EC firmware and ACPI/WMI methods compared, in-session restoration and off/medium/high cycle verified on the same PC. Additional startup and desktop-handoff verification was completed with the v0.3 extension described above. The public package and installer have not been installed on a second PC. Offline checks cover compatibility, refusal of unknown configurations and preference migration; they send no controller commands.
 
 Suspend/resume, rapid presses and all hardware variants are not fully tested. Read logs on failure; do not retry low-level EC writes manually. The mailbox/state helpers are internal implementation details, not generic controller commands.
 
